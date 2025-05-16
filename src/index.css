@@ -7,7 +7,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #fff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -20,10 +20,19 @@
   button{
     @apply bg-orange-500 rounded-sm md:py-3 py-4 text-white;
   }
+  button:hover{
+    @apply bg-orange-600 transition-all
+  }
+  button:active{
+    @apply bg-black transition-all
+  }
   h1{
-    @apply text-black text-2xl font-bold;
+    @apply text-black text-lg md:text-2xl font-bold;
   }
   li{
     @apply text-black list-disc text-lg tracking-wider my-2;
+  }
+  p{
+    @apply text-sm md:text-[1rem]
   }
 }

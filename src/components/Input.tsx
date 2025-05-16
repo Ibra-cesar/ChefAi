@@ -1,13 +1,33 @@
+import { useState } from "react";
+import InputForm from "./InputForm";
+import IngredientsList from "./IngredientsList";
+import { IngredientsSchema } from "./schema/schema";
+
 const Input = () => {
+  const [data, setData] = useState<Array<string>>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const formHandler = (items: string) => {
+    const parsed = IngredientsSchema.parse({ value: { ingredient: items } });
+    
+    if (!parsed.success) {
+      setError(parsed.error);
+      return false;
+    }
+    
+    const normalize = parsed.data.ingredient;
+
+    if (data.some((i) => i === normalize)) {
+      setError("This ingredient is already exist!");
+    }
+    console.log(data);
+    setData([...data, normalize]);
+  };
   return (
-    <section className="flex flex-row items-center justify-center pt-20 w-full">
-      <form action="/">
-        <input type="text" placeholder="e.g ingredients ..." className=" mr-5 border text-black w-[15rem]  sm:w-[20rem] md:w-[30rem] h-[2.5rem] rounded-md p-2.5" />
-        <button className=" px-2 sm:px-5 md:px-10 sm:text-[0.8rem] text-[0.7rem] tracking-[0.1rem] font-semibold">
-          + Add ingredients
-        </button>
-      </form>
-    </section>
+    <>
+      <InputForm onSubmit={formHandler} error={error} />
+      <IngredientsList items={data} />
+    </>
   );
 };
 
