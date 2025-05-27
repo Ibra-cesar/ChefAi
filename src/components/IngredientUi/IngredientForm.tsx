@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from "react";
-
+import { Button } from "../ui/Button";
 interface PropsTypes {
   onSubmit: (text: string) => void;
   error: string | null
 }
 
-const InputForm = ({ onSubmit, error }: PropsTypes) => {
+const IngredientForm = ({ onSubmit, error }: PropsTypes) => {
   const [input, setInput] = useState("");
 
   function formHandler(e: FormEvent<HTMLFormElement>) {
@@ -26,13 +26,11 @@ const InputForm = ({ onSubmit, error }: PropsTypes) => {
           placeholder="e.g 12 Eggs ..."
           className=" mr-5 border text-black w-[15rem]  sm:w-[20rem] md:w-[30rem] h-[2.5rem] rounded-md p-2.5"
         />
-        <button className=" px-2 sm:px-5 md:px-10 sm:text-[0.8rem] text-[0.7rem] tracking-[0.1rem] font-semibold">
-          + Add ingredients
-        </button>
+        <Button variants="primary" size="lg">Add Ingredient</Button>
         {error && <p className="text-xs text-red-500">{error}</p>}
       </form>
     </section>
   );
 };
 
-export default InputForm;
+export default IngredientForm;

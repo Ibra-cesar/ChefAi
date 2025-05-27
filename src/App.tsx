@@ -1,13 +1,18 @@
-import Header from "./components/Header"
-import Input from "./components/Input";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import SignUpPage from "./pages/SignUpPage";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
   return (
-    <main className="bg-white mx-auto my-22 md:w-[50rem] w-full border-4 border-gray-300 rounded-xl">
-      <Header />
-      <Input/> 
-    </main>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/log-in" element={<LoginPage />} />
+      </Routes>
+    </Router>
   );
 }
 
-export default App
+export default App;

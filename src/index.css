@@ -17,15 +17,7 @@
 
 
 @layer base{
-  button{
-    @apply bg-orange-500 rounded-sm md:py-3 py-4 text-white;
-  }
-  button:hover{
-    @apply bg-orange-600 transition-all
-  }
-  button:active{
-    @apply bg-black transition-all
-  }
+  
   h1{
     @apply text-black text-lg md:text-2xl font-bold;
   }
@@ -34,5 +26,21 @@
   }
   p{
     @apply text-sm md:text-[1rem]
+  }
+}
+
+@layer components {
+  .loading-container{
+    @apply flex flex-col items-center justify-center p-2 rounded-[8px] bg-white transition-all 
+  }
+
+  .loading-container.small{
+    @apply w-[120px] h-[120px]
+  }
+  .loading-container.medium {
+    @apply w-[180px] h-[180px]
+  }
+  .loading-container.large {
+    @apply w-[180px] h-[180px]
   }
 }
