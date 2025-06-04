@@ -1,4 +1,5 @@
-import useIsMobile from "../../hooks/isMobile";
+import useIsMobile from "../../utils/contexts/hooks/isMobile";
+
 
 interface PropsTypes {
   items: Array<string>;

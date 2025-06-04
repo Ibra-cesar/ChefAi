@@ -1,8 +1,13 @@
 import { Button } from '../ui/Button';
 
-const RecipeList = () => {
+type Ingredient = {
+  data: string[]
+}
+
+const RecipeList = ({data}: Ingredient) => {
   return (
-    <section className="flex items-center justify-center p-4 ">
+    <>
+   {data.length > 0  &&(<section className="flex items-center justify-center p-4 ">
       <div className="bg-gray-100 w-[37rem] md:w-[50rem] rounded-lg p-5 flex justify-center items-center gap-10 border-2 border-orange-400">
         <div className="md:w-[80%] w-[70%]">
           <h1 className="mb-2">SEND RECIPE</h1>
@@ -17,7 +22,8 @@ const RecipeList = () => {
           </Button>
         </div>
       </div>
-    </section>
+    </section>)}
+    </>
   );
 }
 

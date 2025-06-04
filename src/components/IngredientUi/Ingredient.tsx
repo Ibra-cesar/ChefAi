@@ -32,7 +32,7 @@ const Ingredient = () => {
     <>
       <IngredientForm onSubmit={formHandler} error={error} />
       <IngredientsList items={data} />
-      <RecipeList/>
+      <RecipeList data={data}/>
     </>
   );
 };

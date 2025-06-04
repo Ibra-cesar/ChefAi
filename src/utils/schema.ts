@@ -26,7 +26,19 @@ export const IngredientsSchema = z.object({
 
 export type IngredientsSchemaType = z.infer<typeof IngredientsSchema>
 
-export const AuthFormSchema = z.object({
+export const SignUpForm = z.object({
+  name: z
+    .string()
+    .min(2, { message: "Password must atleast 2 characters." })
+    .max(100, { message: "Password must least than 100 characters." })
+    .toLowerCase(),
+  password: z
+    .string()
+    .min(8, { message: "Password must atleast 2 characters." })
+    .max(16, { message: "Password must least than 16 characters." }),
+  email: z.string().email({ message: "Invalid Email." }),
+});
+export const SignInForm = z.object({
   name: z
     .string()
     .min(2, { message: "Password must atleast 2 characters." })
