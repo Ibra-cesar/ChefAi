@@ -42,7 +42,7 @@ const SignUpForms = () => {
           />
           {errors.name && (
             <span className=" text-red-500 text-sm">
-              {errors.name?.message}
+              {errors.name.message}
             </span>
           )}
           <h1 className="text-gray-700 text-sm font-thin">Email</h1>
@@ -58,7 +58,7 @@ const SignUpForms = () => {
           ) : (
             errors.email && (
               <span className=" text-red-500 text-sm">
-                {errors.email?.message}
+                {errors.email.message}
               </span>
             )
           )}
@@ -72,7 +72,7 @@ const SignUpForms = () => {
           />
           {errors.password && (
             <span className=" text-red-500 text-sm">
-              {errors.password?.message}
+              {errors.password.message}
             </span>
           )}
         </div>

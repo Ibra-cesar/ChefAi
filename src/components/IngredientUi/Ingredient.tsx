@@ -8,31 +8,37 @@ const Ingredient = () => {
   const [data, setData] = useState<Array<string>>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const formHandler = (items: string ) => {
+  const formHandler = (items: string) => {
     const parsed = IngredientsSchema.safeParse({ ingredient: items });
-    
+
     if (!parsed.success) {
       setError(parsed.error.errors[0].message);
       return false;
     }
-    
+
     const normalize = parsed.data.ingredient;
 
     if (data.includes(normalize)) {
       setError("This ingredient is already exist!");
       return;
-    }else{
-      setError(null)
+    } else {
+      setError(null);
       const newData = [...data, normalize];
       setData(newData);
       console.log(data);
     }
   };
+
+  const handleDelete = (index: number) => {
+    setData((prev) => prev.filter((_, idx) => idx !== index)); // Remove the ingredient at the given index
+    console.log(data);
+  };
+
   return (
     <>
       <IngredientForm onSubmit={formHandler} error={error} />
-      <IngredientsList items={data} />
-      <RecipeList data={data}/>
+      <IngredientsList onDelete={handleDelete} items={data} />
+      <RecipeList data={data} />
     </>
   );
 };

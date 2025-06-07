@@ -42,14 +42,11 @@ export const signUpForm = z.object({
 export type SignUpForm = z.infer<typeof signUpForm>
 
 export const signInForm = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Password must atleast 2 characters." })
-    .max(100, { message: "Password must least than 100 characters." })
-    .toLowerCase(),
   password: z
     .string()
-    .min(8, { message: "Password must atleast 2 characters." })
-    .max(16, { message: "Password must least than 16 characters." }),
-  email: z.string().email({ message: "Invalid Email." }),
+    .min(8)
+    .max(16),
+  email: z.string().email(),
 });
+
+export type SignInForm = z.infer<typeof signInForm>

@@ -19,21 +19,23 @@ export interface AuthContextsType {
   signIn: (data: SignInData) => Promise<void>;
   signUp: (data: SignUpData) => Promise<void>;
   signOut: () => Promise<void>;
-  error: string
+  error: string;
 }
 
 export type Recipe = {
-  id: string
+  id: string;
   title: string;
   description: string;
   ingredients: string[];
-  instruction: string[]
-}
+  instruction: string[];
+};
 
-export interface RecipeContextType{
-  recipes: Recipe[]
+export interface RecipeContextType {
+  recipes: Recipe[];
   loading: boolean;
-  fetchRecipes: ()=> void
-  recipeToList: (recipe: Recipe)=>void,
-  error: string
+  fetchRecipes: () => Promise<void>;
+  recipeToList: (recipe: Recipe) => void;
+  generateRecipe: (ingredient: string[]) => Promise<void>;
+  selectRecipe: Recipe | null
+  error: string;
 }

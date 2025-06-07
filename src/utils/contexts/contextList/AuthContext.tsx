@@ -3,18 +3,14 @@ import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "../Context";
 import type { SignInData, SignUpData, User } from "../../types";
 import { extractErrorMessage } from "../../getErrorMessage";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-const Routes = {
-  signUp: "/sign-up",
-  signIn: "/sign-in",
-} as const;
-
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const location = useLocation();
+  const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -90,15 +86,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   useEffect(() => {
-    if (
-      location.pathname === Routes.signUp ||
-      location.pathname === Routes.signIn
-    ) {
-      setLoading(false)
-      return
+    const initializeAuth = async () => {
+      await checkAuth(); // Wait for `checkAuth` to complete
+    };
+
+    initializeAuth();
+  }, [checkAuth]);
+
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true }); // Redirect to dashboard if user is logged in
     }
-    checkAuth()
-  }, [checkAuth, location.pathname]);
+  }, [user, navigate]); 
 
   const contextValue = {
     user,
