@@ -26,19 +26,22 @@ export const IngredientsSchema = z.object({
 
 export type IngredientsSchemaType = z.infer<typeof IngredientsSchema>
 
-export const SignUpForm = z.object({
+export const signUpForm = z.object({
   name: z
     .string()
-    .min(2, { message: "Password must atleast 2 characters." })
-    .max(100, { message: "Password must least than 100 characters." })
+    .min(2)
+    .max(100)
     .toLowerCase(),
   password: z
     .string()
-    .min(8, { message: "Password must atleast 2 characters." })
-    .max(16, { message: "Password must least than 16 characters." }),
-  email: z.string().email({ message: "Invalid Email." }),
+    .min(8)
+    .max(16),
+  email: z.string().email(),
 });
-export const SignInForm = z.object({
+
+export type SignUpForm = z.infer<typeof signUpForm>
+
+export const signInForm = z.object({
   name: z
     .string()
     .min(2, { message: "Password must atleast 2 characters." })

@@ -1,106 +1,113 @@
 import axios from "axios";
-import React, { useCallback, useState, type ReactNode } from "react";
-
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "../Context";
-import type { User } from "../../types";
-
+import type { SignInData, SignUpData, User } from "../../types";
+import { extractErrorMessage } from "../../getErrorMessage";
+import { useLocation } from "react-router-dom";
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-const extractErrorMessage = (error: unknown) => {
-  if (axios.isAxiosError(error)) {
-    return error.response?.data?.message || error.message;
-  }
-  return "Unknown Error Ocurred";
-};
+const Routes = {
+  signUp: "/sign-up",
+  signIn: "/sign-in",
+} as const;
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
+  const location = useLocation();
   const [user, setUser] = useState<User | null>(null);
-  const [isAuth, setIsAuth] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const BASE_URL = "http://localhost:3000";
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const BASE_URL = "http://localhost:5000/api/v1";
 
   const checkAuth = useCallback(async () => {
+    setLoading(true);
+    setError("");
     try {
-      setIsAuth(true);
-      const res = await axios.get(`${BASE_URL}/api/v1/users/me`, {
-        withCredentials: true,
-        timeout: 10000,
-      });
-
-      if(res.data?.success && res.data?.data){
-        setUser(res.data.data);
-        setIsAuth(true);
-      }else{
-        setUser(null);
-        setIsAuth(false);
-      }
-    } catch {
-      // Handle error if needed, e.g., log or set error state
-      setUser(null);
-      setIsAuth(false);
+      const response = await axios.get(`${BASE_URL}/users/me`,{withCredentials: true});
+      setUser(response.data.data);
+    } catch (error) {
+      setError(extractErrorMessage(error));
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const signUp = useCallback(
-    async (name: string, email: string, password: string) => {
-      try {
-        await axios.post(
-          `${BASE_URL}/api/v1/auth/sign-up`,
-          { name, email, password },
-          { withCredentials: true }
-        );
-        await checkAuth();
-      } catch (error) {
-        return extractErrorMessage(error);
-      }
-    },
-    [checkAuth]
-  );
-  const signIn = useCallback(
-    async (email: string, password: string) => {
-      try {
-        await axios.post(
-          `${BASE_URL}/api/v1/auth/sign-in`,
-          { email, password },
-          { withCredentials: true }
-        );
-        await checkAuth();
-      } catch (error) {
-        return extractErrorMessage(error);
-      }
-    },
-    [checkAuth]
-  );
-  const logOut = useCallback(async () => {
+  const signUp = async (data: SignUpData): Promise<void> => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await axios.post(`${BASE_URL}/auth/sign-up`, data, {
+        withCredentials: true,
+      });
+
+      setUser(response.data);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signIn = async (data: SignInData): Promise<void> => {
+    setLoading(false);
+    setError("");
+    try {
+      const response = await axios.post(
+        `${BASE_URL}/auth/sign-in`,
+        data,
+        { withCredentials: true }
+      );
+      setUser(response.data);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = async (): Promise<void> => {
+    setLoading(true);
+    setError("");
+
     try {
       await axios.post(
-        `${BASE_URL}/api/v1/auth/sign-out`,
+        `${BASE_URL}/auth/sign-out`,
         {},
         { withCredentials: true }
       );
-      setUser(null);
-      setIsAuth(false);
-    } catch (error) {
-      return extractErrorMessage(error);
-    }
-  }, []);
 
-  const contextValue = React.useMemo(
-    () => ({
-      user,
-      isAuth,
-      loading,
-      signUp,
-      signIn,
-      logOut,
-      checkAuth,
-    }),
-    [user, isAuth, loading, signUp, signIn, logOut, checkAuth]
-  );
+      setUser(null);
+    } catch (error) {
+      const message = extractErrorMessage(error);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      location.pathname === Routes.signUp ||
+      location.pathname === Routes.signIn
+    ) {
+      setLoading(false)
+      return
+    }
+    checkAuth()
+  }, [checkAuth, location.pathname]);
+
+  const contextValue = {
+    user,
+    loading,
+    error,
+    signUp,
+    signIn,
+    signOut,
+  };
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

@@ -1,29 +1,25 @@
 import { useAuth } from "./contexts/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import type React from "react";
-import { useEffect, useState } from "react";
+import LoadingContainer from "../components/ui/LoadingContainer";
 
 interface AuthProps {
   children: React.ReactNode;
 }
 
 export const ProtectedRoutes = ({ children }: AuthProps) => {
-  const { isAuth, loading, checkAuth } = useAuth();
-  const [hasChecked, setHasChecked] = useState<boolean>(false)
+  const { user, loading } = useAuth();
 
-  useEffect(() => {
-    async function Users(){
-      await checkAuth()
-      setHasChecked(true)
-    }
-    Users()
-  },[checkAuth])
+  if (loading)
+    return (
+      <div className="flex items-center justify-center">
+        <LoadingContainer />
+      </div>
+    );
 
-  if (!hasChecked || loading) return <p className="text-black">Loading...</p>;
-
-  if (!isAuth) {
-    console.log("user is not auth")
-    return <Navigate to={"/sign-up"}/>;
+  if (!user) {
+    console.log("user is not auth");
+    return <Navigate to={"/sign-up"} />;
   }
   return <>{children}</>;
 };

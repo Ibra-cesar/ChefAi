@@ -1,5 +1,4 @@
 import { useState, type FormEvent } from "react";
-import { Button } from "../ui/Button";
 interface PropsTypes {
   onSubmit: (text: string) => void;
   error: string | null
@@ -16,7 +15,7 @@ const IngredientForm = ({ onSubmit, error }: PropsTypes) => {
   }
 
   return (
-    <section className="flex flex-row items-center justify-center pt-20 w-full">
+    <section className="flex flex-row mx-7 justify-center pt-20 ">
       <form action="/" onSubmit={formHandler}>
         <input
           value={input}
@@ -26,7 +25,7 @@ const IngredientForm = ({ onSubmit, error }: PropsTypes) => {
           placeholder="e.g 12 Eggs ..."
           className=" mr-5 border text-black w-[15rem]  sm:w-[20rem] md:w-[30rem] h-[2.5rem] rounded-md p-2.5"
         />
-        <Button variants="primary" size="lg">Add Ingredient</Button>
+        <button className="px-7 py-2 bg-orange-500 text-lg tracking-wide rounded-md mt-10">Add Recipe</button>
         {error && <p className="text-xs text-red-500">{error}</p>}
       </form>
     </section>

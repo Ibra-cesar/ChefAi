@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -20,7 +20,7 @@ export default function RateLimitDashboard() {
   const [data, setData] = useState<RateLimitRecord[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const res = await fetch(
@@ -35,11 +35,11 @@ export default function RateLimitDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [endpoint, limit]);
 
   useEffect(() => {
     if (endpoint) fetchData();
-  },[]);
+  },[endpoint, fetchData]);
 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-4">

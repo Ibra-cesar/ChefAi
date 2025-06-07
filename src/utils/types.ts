@@ -4,12 +4,36 @@ export interface User {
   email: string;
 }
 
+export type SignUpData = {
+  name: string;
+  email: string;
+  password: string;
+};
+export type SignInData = {
+  email: string;
+  password: string;
+};
 export interface AuthContextsType {
   user: User | null;
-  isAuth: boolean
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (name: string, email: string, password: string) => Promise<void>;
-  logOut: () => Promise<void>;
-  checkAuth: () => Promise<void>;
+  signIn: (data: SignInData) => Promise<void>;
+  signUp: (data: SignUpData) => Promise<void>;
+  signOut: () => Promise<void>;
+  error: string
+}
+
+export type Recipe = {
+  id: string
+  title: string;
+  description: string;
+  ingredients: string[];
+  instruction: string[]
+}
+
+export interface RecipeContextType{
+  recipes: Recipe[]
+  loading: boolean;
+  fetchRecipes: ()=> void
+  recipeToList: (recipe: Recipe)=>void,
+  error: string
 }

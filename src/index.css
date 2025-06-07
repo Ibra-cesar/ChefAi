@@ -7,7 +7,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #fff;
+  background-color: #f7d8b7;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,18 +27,21 @@
   p{
     @apply text-sm md:text-[1rem]
   }
+  input{
+    @apply border-orange-500
+  }
 }
 
 @layer components {
   .loading-container{
-    @apply flex flex-col items-center justify-center p-2 rounded-[8px] bg-white transition-all 
+    @apply flex flex-col items-center justify-center p-2 rounded-[8px] bg-black transition-all 
   }
 
   .loading-container.small{
     @apply w-[120px] h-[120px]
   }
   .loading-container.medium {
-    @apply w-[180px] h-[180px]
+    @apply w-[180px] h-[180px] 
   }
   .loading-container.large {
     @apply w-[180px] h-[180px]

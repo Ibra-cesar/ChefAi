@@ -7,8 +7,8 @@ type Ingredient = {
 const RecipeList = ({data}: Ingredient) => {
   return (
     <>
-   {data.length > 0  &&(<section className="flex items-center justify-center p-4 ">
-      <div className="bg-gray-100 w-[37rem] md:w-[50rem] rounded-lg p-5 flex justify-center items-center gap-10 border-2 border-orange-400">
+   {data.length > 0  &&(<section className="lg:flex flex-col items-center justify-center p-4 ">
+      <div className="bg-gray-100 md:w-[42.5rem] rounded-lg p-5 flex justify-center items-center gap-10 border-2 border-orange-400">
         <div className="md:w-[80%] w-[70%]">
           <h1 className="mb-2">SEND RECIPE</h1>
           <p className="text-gray-600">
@@ -17,7 +17,7 @@ const RecipeList = ({data}: Ingredient) => {
           </p>
         </div>
         <div className="md:w-[20%] w-[30%]">
-          <Button variants="secondary" size="lg">
+          <Button className='bg-orange-500 rounded-md sm:px-7 sm:py-2 px-3 py-3 sm:text-lg'>
             Get Recipe
           </Button>
         </div>
