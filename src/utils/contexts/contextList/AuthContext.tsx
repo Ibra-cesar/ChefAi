@@ -1,112 +1,129 @@
-import axios from "axios";
-import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { AuthContext } from "../Context";
 import type { SignInData, SignUpData, User } from "../../types";
-import { extractErrorMessage } from "../../getErrorMessage";
-import { useNavigate } from "react-router-dom";
+import axios, { AxiosError } from "axios";
+import { ToastError } from "../../Toast";
+import toast from "react-hot-toast";
+
+export const Axios = axios.create({
+  baseURL: "http://localhost:5000/api/v1",
+  withCredentials: true,
+});
+
+Axios.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    if (err?.response?.status === 401) {
+      // Don't show toast if this is the initial auth check
+      const isAuthCheck = err.config?.url?.includes("/users/me");
+      if (!isAuthCheck) {
+        toast.error("You are not logged in.");
+      }
+    }
+
+    return Promise.reject(err);
+  }
+);
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null);
+  const [checkedAuth, setCheckedAuth] = useState<boolean>(false);
+  const [isAthenticated, setIsAuthenticated] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const BASE_URL = "http://localhost:5000/api/v1";
 
-  const checkAuth = useCallback(async () => {
+  useEffect(() => {
+    const checkAuth = async () => {
+      setLoading(true);
+      try {
+        const response = await Axios.get(`/users/me`);
+        setUser(response.data.data);
+        setIsAuthenticated(true);
+      } catch (error) {
+        if (error instanceof AxiosError && error.response?.status === 401) {
+          // Expected when user is not logged in; no need to log it
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } finally {
+        setLoading(false);
+        setCheckedAuth(true);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const signUp = useCallback(async (data: SignUpData): Promise<void> => {
     setLoading(true);
-    setError("");
     try {
-      const response = await axios.get(`${BASE_URL}/users/me`,{withCredentials: true});
+      const response = await Axios.post(`/auth/sign-up`, data);
+
       setUser(response.data.data);
+      setIsAuthenticated(true);
     } catch (error) {
-      setError(extractErrorMessage(error));
+      ToastError(error);
+      setUser(null); // Reset user state on sign-up failure
+      setIsAuthenticated(false);
+      console.error("Sign up failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  },[]);
+
+  const signIn = useCallback(async (data: SignInData): Promise<void> => {
+    setLoading(false);
+    try {
+      const response = await Axios.post(
+        `/auth/sign-in`,
+        data
+      );
+      setUser(response.data.data);
+      console.log("User signed in:", response.data.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      ToastError(error);
+      setIsAuthenticated(false);
+      setUser(null); // Reset user state on sign-in failure
+      console.error("Sign in failed:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const signUp = async (data: SignUpData): Promise<void> => {
+  const signOut = useCallback(async (): Promise<void> => {
     setLoading(true);
-    setError("");
 
     try {
-      const response = await axios.post(`${BASE_URL}/auth/sign-up`, data, {
-        withCredentials: true,
-      });
-
-      setUser(response.data);
-    } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signIn = async (data: SignInData): Promise<void> => {
-    setLoading(false);
-    setError("");
-    try {
-      const response = await axios.post(
-        `${BASE_URL}/auth/sign-in`,
-        data,
-        { withCredentials: true }
-      );
-      setUser(response.data);
-    } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signOut = async (): Promise<void> => {
-    setLoading(true);
-    setError("");
-
-    try {
-      await axios.post(
-        `${BASE_URL}/auth/sign-out`,
+      await Axios.post(
+        `/auth/sign-out`,
         {},
-        { withCredentials: true }
       );
 
       setUser(null);
+      setIsAuthenticated(false);
     } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
+      ToastError(error);
+      console.error("Sign out failed:", error);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      await checkAuth(); // Wait for `checkAuth` to complete
-    };
-
-    initializeAuth();
-  }, [checkAuth]);
-
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard", { replace: true }); // Redirect to dashboard if user is logged in
-    }
-  }, [user, navigate]); 
-
-  const contextValue = {
-    user,
-    loading,
-    error,
-    signUp,
-    signIn,
-    signOut,
-  };
+  const contextValue = useMemo(
+    () => ({
+      user,
+      loading,
+      signUp,
+      signIn,
+      signOut,
+      isAthenticated,
+      checkedAuth
+    }),
+    [user, loading, signUp, signIn, signOut, isAthenticated, checkedAuth]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

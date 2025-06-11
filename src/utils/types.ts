@@ -19,7 +19,8 @@ export interface AuthContextsType {
   signIn: (data: SignInData) => Promise<void>;
   signUp: (data: SignUpData) => Promise<void>;
   signOut: () => Promise<void>;
-  error: string;
+  isAthenticated: boolean;
+  checkedAuth: boolean
 }
 
 export type Recipe = {
@@ -33,9 +34,5 @@ export type Recipe = {
 export interface RecipeContextType {
   recipes: Recipe[];
   loading: boolean;
-  fetchRecipes: () => Promise<void>;
-  recipeToList: (recipe: Recipe) => void;
   generateRecipe: (ingredient: string[]) => Promise<void>;
-  selectRecipe: Recipe | null
-  error: string;
 }

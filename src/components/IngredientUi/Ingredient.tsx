@@ -23,8 +23,7 @@ const Ingredient = () => {
       return;
     } else {
       setError(null);
-      const newData = [...data, normalize];
-      setData(newData);
+      setData([...data, normalize]); // Add the new ingredient to the existing list
       console.log(data);
     }
   };

@@ -1,85 +1,68 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
-import { type Recipe } from "../../types";
-import axios from "axios";
-import { extractErrorMessage } from "../../getErrorMessage";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Recipe } from "../../types";
 import { RecipeContext } from "../Context";
+import { Axios } from "./AuthContext";
+import { ToastError } from "../../Toast";
+import { useAuth } from "../hooks/useAuth";
 
-interface RecipeProps {
-  children: ReactNode;
-}
+type RecipeProviderProps = {
+  children: React.ReactNode;
+};
 
-export const RecipeProvider = ({ children }: RecipeProps) => {
+export const RecipeProvider = ({children}: RecipeProviderProps) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [selectRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
-  const BASE_URL = "http://localhost:5000/api/v1/recipes";
+  const [loading, setLoading] = useState<boolean>(false);
+  const { checkedAuth, isAthenticated } = useAuth();
+
+  useEffect(() => {
+
+    if (!checkedAuth || !isAthenticated) {
+      console.log("User is not authenticated or auth check not completed");
+      return;
+    }
+
+    const fetchRecipes = async () => {
+      setLoading(true);
+      try {
+        const response = await Axios.get("/recipes/all");
+        setRecipes(response.data.data);
+        console.log("Fetched recipes:", response.data.data);
+      } catch (error) {
+        ToastError(error);
+        setRecipes([]); // Reset recipe state on fetch failure
+        console.error("Failed to fetch recipes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecipes();
+  }, [checkedAuth, isAthenticated]);
 
   const generateRecipe = useCallback(async (ingredients: string[]) => {
-    setError("");
-
+    setLoading(true);
     try {
-      const res = await axios.post(`${BASE_URL}/generate`, { ingredients }, {
-        withCredentials: true,
-      });
-      console.log(res)
-      setRecipes(res.data.data);
+      const response = await Axios.post("/recipes/generate", { ingredients });
+      setRecipes(prev => [...prev, response.data.data]);
+      console.log("Generated recipe:", response.data.data);
     } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
+      ToastError(error);
+      setRecipes([]); // Reset recipe state on generation failure
+      console.error("Failed to generate recipe:", error);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  const fetchRecipes = useCallback(async () => {
-    try {
-      const resp = await axios.get(`${BASE_URL}/all`, {
-        withCredentials: true,
-      });
-      console.log(resp)
-      setRecipes(resp.data.data);
-    } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const ContextValue = useMemo(() => ({
+    recipes,
+    loading,
+    generateRecipe,
+  }),[recipes, loading, generateRecipe]);
 
-  const recipeToList = useCallback(async (recipe: Recipe) => {
-    try {
-      setSelectedRecipe(recipe);
-    } catch (error) {
-      const message = extractErrorMessage(error);
-      setError(message);
-    }
-  }, []);
-
-  const contextValue = useMemo(
-    () => ({
-      recipes,
-      loading,
-      fetchRecipes,
-      recipeToList,
-      generateRecipe,
-      error,
-      selectRecipe,
-    }),
-    [
-      recipes,
-      loading,
-      fetchRecipes,
-      recipeToList,
-      error,
-      generateRecipe,
-      selectRecipe,
-    ]
-  );
-
-  return (
-    <RecipeContext.Provider value={contextValue}>
+  return(
+    <RecipeContext.Provider value={ContextValue}>
       {children}
     </RecipeContext.Provider>
-  );
-};
+  )
+}

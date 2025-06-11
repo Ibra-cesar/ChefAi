@@ -8,16 +8,16 @@ interface AuthProps {
 }
 
 export const ProtectedRoutes = ({ children }: AuthProps) => {
-  const { user, loading } = useAuth();
+  const { isAthenticated, loading, checkedAuth } = useAuth();
 
-  if (loading)
+  if (loading || !checkedAuth)
     return (
       <div className="flex items-center justify-center">
         <LoadingContainer />
       </div>
     );
 
-  if (!user) {
+  if (!isAthenticated) {
     console.log("user is not auth");
     return <Navigate to={"/sign-up"} />;
   }

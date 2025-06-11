@@ -1,13 +1,13 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../ui/Button";
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { signInForm, type SignInForm } from "../../utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../utils/contexts/hooks/useAuth";
 import LoadingContainer from "../ui/LoadingContainer";
 
 const SignInForm = () => {
-  const {signIn, error, loading} = useAuth()
+  const {signIn, isAthenticated, loading, user} = useAuth()
   const {
     register,
     formState: { errors },
@@ -18,10 +18,14 @@ const SignInForm = () => {
   });
   const navigate = useNavigate();
 
+  if (isAthenticated) return <Navigate to="/dashboard" replace />;
+
   const handleSignIn: SubmitHandler<SignInForm> = async (data) => {
     try {
       await signIn(data)
-      navigate('/dashboard', {replace: true})
+      if (user) {
+        navigate(`/dashboard/${user.name}`, { replace: true })
+      }
     } catch (error) {
       setError("root", {
         message: `Form subbmission failed, ${error}`,
@@ -51,14 +55,18 @@ const SignInForm = () => {
             className="border text-black w-[15rem]  sm:w-[20rem] md:w-[30rem] h-[2.5rem] rounded-md p-2.5"
             required
           />
-        </div>
-        {errors.email && (
-          <span className=" text-red-500 text-sm">{errors.email.message}</span>
+        {errors.password && (
+          <span className=" text-red-500 text-sm">{errors.password.message}</span>
         )}
-        {error && <span className=" text-red-500 text-sm">{error}</span>}
+        </div>
+        <div className="flex justify-center items-center">
         <Button variants="secondary" size="lg" disabled={loading}>
           {loading ? <LoadingContainer /> : "log-in"}
         </Button>
+        <Link to={"/sign-up"} className="text-blue-500 ml-3 hover:underline">
+          Don't have an account? Sign Up
+        </Link>
+        </div>
       </form>
     </section>
   );

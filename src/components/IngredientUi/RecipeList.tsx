@@ -1,32 +1,25 @@
-import { useEffect, useState } from "react";
-import { useRecipe } from "../../utils/contexts/hooks/useRecipe";
 import LoadingContainer from "../ui/LoadingContainer";
-import { useAuth } from "../../utils/contexts/hooks/useAuth";
+import { useRecipe } from "../../utils/contexts/hooks/useRecipe";
+import { useNavigate, useParams } from "react-router-dom";
 
 type Ingredient = {
   data: string[];
 };
 
 const RecipeList = ({ data }: Ingredient) => {
-  const { generateRecipe, loading, error, recipes, selectRecipe } = useRecipe();
-  const [showRecipe, setShowRecipe] = useState(false);
-  const { fetchRecipes } = useRecipe();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      fetchRecipes();
-    }
-  }, [user, fetchRecipes]);
-
-  useEffect(() => {
-    console.log("Recipes in RecipeList:", recipes);
-  }, [recipes]);
+  const { username } = useParams();
+  const navigate = useNavigate();
+  const { recipes, loading, generateRecipe } = useRecipe();
 
   const generate = async () => {
     await generateRecipe(data);
-    console.log(data);
-    setShowRecipe(showRecipe);
+    if (recipes) {
+      console.log(recipes);
+      // Navigate to the dashboard with the username and recipe IDs
+      navigate(`/dashboard/${username}/${recipes.map((recipe) => recipe.id)}`, {
+        replace: true,
+      });
+    }
   };
   return (
     <>
@@ -44,75 +37,56 @@ const RecipeList = ({ data }: Ingredient) => {
               <button
                 className="bg-orange-500 rounded-md sm:px-7 sm:py-2 px-3 py-3 sm:text-lg"
                 onClick={generate}
+                disabled={loading}
               >
-                Get Recipe
+                {loading ? <LoadingContainer /> : "Generate Recipe"}
               </button>
             </div>
           </div>
         </section>
       )}
-      {selectRecipe ? (
-        <section className="flex flex-col justify-center w-full pt-10 px-10 gap-5">
-          <h1 className="text-xl">Recipe List</h1>
-          <h1 className="text-2xl">{selectRecipe.title}</h1>
-          <p className="text-black text-lg tracking-wide my-3">
-            {selectRecipe.description}
-          </p>
-          <h1 className="text-2xl">Ingredients: </h1>
-          <ul className="mb-2">
-            {selectRecipe.ingredients.map((ingredient, idx) => (
-              <li key={idx} className="text-[1rem] ml-8 mb-3">
-                {ingredient}
-              </li>
-            ))}
-          </ul>
-          <h1 className="text-2xl">Instructions: </h1>
-          <ul className="mb-10">
-            {selectRecipe.instruction.map((instruction, idx) => (
-              <li key={idx} className="text-[1rem] ml-8 mb-3">
-                {instruction}
-              </li>
-            ))}
-          </ul>
-          {error && <span>{error}</span>}
-        </section>
-      ) : recipes.length === 0 ? (
-        <div className="flex flex-col items-center text-gray-500">
-          <p>
-            No recipes yet. Add ingredients and click "Get Recipe" to see the
-            magic!
-          </p>
+      {loading ? (
+        <div className="flex justify-center items-center h-screen">
+          <LoadingContainer />
         </div>
       ) : (
-        showRecipe &&
-        (loading ? (
-          <LoadingContainer />
-        ) : (
-          <section className='className="flex flex-col justify-center w-full pt-10 px-10"'>
-            <h2>Recipe List</h2>
-            <ul>
-              {recipes.map((recipe) => (
-                <li key={recipe.id}>
-                  <h2 className="text-black">{recipe.title}</h2>
-                  <p>{recipe.description}</p>
-                  <h2>Ingredients: </h2>
-                  <ul>
-                    {recipe.ingredients.map((ingredient, idx) => (
-                      <li key={idx}>{ingredient}</li>
-                    ))}
-                  </ul>
-                  <h2>Instruction: </h2>
-                  <ul>
-                    {recipe.instruction.map((instructions, idx) => (
-                      <li key={idx}>{instructions}</li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-            {error && <span>{error}</span>}
-          </section>
-        ))
+        <section className="flex flex-col items-center justify-center p-10">
+          {recipes.length > 0 ? (
+            recipes.map((recipe) => (
+              <div
+                key={recipe.id}
+                className="text-black w-full md:w-[42.5rem] rounded-lg p-5 mb-5 shadow-lg border-2 border-orange-400"
+              >
+                <h2 className="text-xl font-bold mb-5">{recipe.title}</h2>
+                <p className="text-gray-700 mb-10">{recipe.description}</p>
+                <ul className="list-disc pl-5  mb-10">
+                  <h2 className="text-black text-lg font-bold mb-5">
+                    Ingredients:
+                  </h2>
+                  {recipe.ingredients.map((ingredient, index) => (
+                    <li key={index} className="text-black text-sm mb-2">
+                      {ingredient}
+                    </li>
+                  ))}
+                </ul>
+                <ul className="list-disc pl-5  mb-10">
+                  <h2 className="text-black text-lg font-bold mb-5">
+                    Instructions:{" "}
+                  </h2>
+                  {recipe.instruction.map((instructions, index) => (
+                    <li key={index} className="text-black text-sm mb-2">
+                      {instructions}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          ) : (
+            <p className="text-black">
+              Make the ingredient and generate the recipe!.
+            </p>
+          )}
+        </section>
       )}
     </>
   );

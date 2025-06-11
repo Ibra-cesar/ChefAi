@@ -4,11 +4,11 @@ import { signUpForm, type SignUpForm } from "../../utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import LoadingContainer from "../ui/LoadingContainer";
 import { useAuth } from "../../utils/contexts/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 const SignUpForms = () => {
   const navigate = useNavigate()
-  const { signUp, error, loading } = useAuth();
+  const { isAthenticated, signUp, loading, user } = useAuth();
   const {
     register,
     handleSubmit,
@@ -18,10 +18,14 @@ const SignUpForms = () => {
     resolver: zodResolver(signUpForm),
   });
 
+  if (isAthenticated) return <Navigate to="/dashboard" replace />;
+
   const onSubmit: SubmitHandler<SignUpForm> = async (data) => {
     try {
       await signUp(data);
-      navigate('/dashboard', {replace: true})
+      if (user) {
+        navigate(`/dashboard/${user.name}`, { replace: true });
+      }
     } catch (error) {
       setError("root", {
         message: `Form subbmission failed, ${error}`,
@@ -53,15 +57,11 @@ const SignUpForms = () => {
             className="border text-black w-[15rem]  sm:w-[20rem] md:w-[30rem] h-[2.5rem] rounded-md p-2.5"
             required
           />
-          {error ? (
-            <span className=" text-red-500 text-sm">{error}</span>
-          ) : (
-            errors.email && (
+            {errors.email && (
               <span className=" text-red-500 text-sm">
                 {errors.email.message}
               </span>
-            )
-          )}
+            )}
           <h1 className="text-gray-700 text-sm font-thin">Password</h1>
           <input
             {...register("password")}
@@ -76,6 +76,7 @@ const SignUpForms = () => {
             </span>
           )}
         </div>
+        <div>
         <Button
           type="submit"
           variants="secondary"
@@ -84,6 +85,10 @@ const SignUpForms = () => {
         >
           {loading ? <LoadingContainer /> : "SignUp"}
         </Button>
+        <Link to={"/log-in"} className="text-blue-500 ml-3 hover:underline">
+          Already have an account? Log In
+        </Link>
+        </div>
       </form>
     </section>
   );
