@@ -20,7 +20,7 @@ export interface AuthContextsType {
   signUp: (data: SignUpData) => Promise<void>;
   signOut: () => Promise<void>;
   isAthenticated: boolean;
-  checkedAuth: boolean
+  checkedAuth: boolean;
 }
 
 export type Recipe = {
@@ -35,4 +35,6 @@ export interface RecipeContextType {
   recipes: Recipe[];
   loading: boolean;
   generateRecipe: (ingredient: string[]) => Promise<void>;
+  displayedRecipe: (recipeId: string) => Promise<void>;
+  displayRecipes: Recipe | null;
 }

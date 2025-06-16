@@ -59,11 +59,11 @@ const SignInForm = () => {
           <span className=" text-red-500 text-sm">{errors.password.message}</span>
         )}
         </div>
-        <div className="flex justify-center items-center">
+        <div className="flex flex-col sm:flex-row justify-center items-center">
         <Button variants="secondary" size="lg" disabled={loading}>
           {loading ? <LoadingContainer /> : "log-in"}
         </Button>
-        <Link to={"/sign-up"} className="text-blue-500 ml-3 hover:underline">
+        <Link to={"/sign-up"} className="text-blue-500 ml-3 text-sm hover:underline">
           Don't have an account? Sign Up
         </Link>
         </div>

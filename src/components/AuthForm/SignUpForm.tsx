@@ -76,7 +76,7 @@ const SignUpForms = () => {
             </span>
           )}
         </div>
-        <div>
+        <div className="flex flex-col sm:flex-row justify-between items-center">
         <Button
           type="submit"
           variants="secondary"
@@ -85,7 +85,7 @@ const SignUpForms = () => {
         >
           {loading ? <LoadingContainer /> : "SignUp"}
         </Button>
-        <Link to={"/log-in"} className="text-blue-500 ml-3 hover:underline">
+        <Link to={"/log-in"} className="text-blue-500 ml-3 text-sm hover:underline">
           Already have an account? Log In
         </Link>
         </div>

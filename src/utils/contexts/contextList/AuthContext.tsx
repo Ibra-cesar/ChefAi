@@ -3,27 +3,11 @@ import { AuthContext } from "../Context";
 import type { SignInData, SignUpData, User } from "../../types";
 import axios, { AxiosError } from "axios";
 import { ToastError } from "../../Toast";
-import toast from "react-hot-toast";
 
 export const Axios = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: "https://chefai.duckdns.org/api/v1",
   withCredentials: true,
 });
-
-Axios.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err?.response?.status === 401) {
-      // Don't show toast if this is the initial auth check
-      const isAuthCheck = err.config?.url?.includes("/users/me");
-      if (!isAuthCheck) {
-        toast.error("You are not logged in.");
-      }
-    }
-
-    return Promise.reject(err);
-  }
-);
 
 interface AuthProviderProps {
   children: ReactNode;

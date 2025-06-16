@@ -11,6 +11,7 @@ type RecipeProviderProps = {
 
 export const RecipeProvider = ({children}: RecipeProviderProps) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [displayRecipes, setDisplayRecipes] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const { checkedAuth, isAthenticated } = useAuth();
 
@@ -44,6 +45,7 @@ export const RecipeProvider = ({children}: RecipeProviderProps) => {
     try {
       const response = await Axios.post("/recipes/generate", { ingredients });
       setRecipes(prev => [...prev, response.data.data]);
+      setDisplayRecipes(response.data.data);
       console.log("Generated recipe:", response.data.data);
     } catch (error) {
       ToastError(error);
@@ -54,11 +56,20 @@ export const RecipeProvider = ({children}: RecipeProviderProps) => {
     }
   }, []);
 
+  const displayedRecipe = useCallback(async(recipeId: string) => {
+    const recipe = recipes.find(r => r.id === recipeId)
+    if(recipe){
+      setDisplayRecipes(recipe);
+    }
+  }, [recipes]);
+
   const ContextValue = useMemo(() => ({
     recipes,
     loading,
     generateRecipe,
-  }),[recipes, loading, generateRecipe]);
+    displayedRecipe,
+    displayRecipes,
+  }),[recipes, loading, generateRecipe, displayedRecipe, displayRecipes]);
 
   return(
     <RecipeContext.Provider value={ContextValue}>

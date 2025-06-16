@@ -8,8 +8,9 @@ import { Link, useParams } from "react-router-dom";
 
 const SideBar = () => {
   const {username} = useParams();
-  const { recipes, loading } = useRecipe();
+  const { recipes, loading, displayedRecipe } = useRecipe();
   const { isOpen, togle } = useSideBar();
+  
 
   return (
     <>
@@ -21,7 +22,7 @@ const SideBar = () => {
       </button>
 
       <aside
-        className={`fixed top-0 left-0 bg-white text-black w-[18rem] h-screen p-5 overflow-y-auto z-40 duration-100
+        className={`fixed top-0 left-0 bg-white text-black w-[18rem] h-full p-5 flex-grow overflow-y-auto z-40 duration-100
             ${
               isOpen ? "translate-x-0" : "-translate-x-full"
             } rounded-r-md border-r-[1.5px] border-orange-500`}
@@ -35,7 +36,7 @@ const SideBar = () => {
           <ul className="space-y-3">
             {recipes?.map((recipe) => (
               <li key={recipe.id} className="hover:bg-gray-100 p-2 rounded">
-                <Link to={`/dashboard/${username}/${recipe.id}`}>
+                <Link to={`/dashboard/${username}/${recipe.id}`} onClick={() => displayedRecipe(recipe.id)}>
                   {recipe.title}
                 </Link>
               </li>

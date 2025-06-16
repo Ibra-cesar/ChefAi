@@ -9,14 +9,14 @@ type Ingredient = {
 const RecipeList = ({ data }: Ingredient) => {
   const { username } = useParams();
   const navigate = useNavigate();
-  const { recipes, loading, generateRecipe } = useRecipe();
+  const { loading, generateRecipe, displayRecipes } = useRecipe();
 
   const generate = async () => {
     await generateRecipe(data);
-    if (recipes) {
-      console.log(recipes);
+    if (displayRecipes) {
+      console.log(displayRecipes);
       // Navigate to the dashboard with the username and recipe IDs
-      navigate(`/dashboard/${username}/${recipes.map((recipe) => recipe.id)}`, {
+      navigate(`/dashboard/${username}/${displayRecipes.id}`, {
         replace: true,
       });
     }
@@ -51,19 +51,18 @@ const RecipeList = ({ data }: Ingredient) => {
         </div>
       ) : (
         <section className="flex flex-col items-center justify-center p-10">
-          {recipes.length > 0 ? (
-            recipes.map((recipe) => (
+          {displayRecipes !== null ? (
               <div
-                key={recipe.id}
+                key={displayRecipes.id}
                 className="text-black w-full md:w-[42.5rem] rounded-lg p-5 mb-5 shadow-lg border-2 border-orange-400"
               >
-                <h2 className="text-xl font-bold mb-5">{recipe.title}</h2>
-                <p className="text-gray-700 mb-10">{recipe.description}</p>
+                <h2 className="text-xl font-bold mb-5">{displayRecipes.title}</h2>
+                <p className="text-gray-700 mb-10">{displayRecipes.description}</p>
                 <ul className="list-disc pl-5  mb-10">
                   <h2 className="text-black text-lg font-bold mb-5">
                     Ingredients:
                   </h2>
-                  {recipe.ingredients.map((ingredient, index) => (
+                  {displayRecipes.ingredients.map((ingredient, index) => (
                     <li key={index} className="text-black text-sm mb-2">
                       {ingredient}
                     </li>
@@ -73,14 +72,13 @@ const RecipeList = ({ data }: Ingredient) => {
                   <h2 className="text-black text-lg font-bold mb-5">
                     Instructions:{" "}
                   </h2>
-                  {recipe.instruction.map((instructions, index) => (
+                  {displayRecipes.instruction.map((instructions, index) => (
                     <li key={index} className="text-black text-sm mb-2">
                       {instructions}
                     </li>
                   ))}
                 </ul>
               </div>
-            ))
           ) : (
             <p className="text-black">
               Make the ingredient and generate the recipe!.
