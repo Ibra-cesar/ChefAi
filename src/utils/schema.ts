@@ -41,7 +41,7 @@ export const signUpForm = z.object({
 
 export type SignUpForm = z.infer<typeof signUpForm>
 
-export const signInForm = z.object({
+export const signInFormSchema = z.object({
   password: z
     .string()
     .min(8)
@@ -49,4 +49,4 @@ export const signInForm = z.object({
   email: z.string().email(),
 });
 
-export type SignInForm = z.infer<typeof signInForm>
+export type signInFormSchemaTypes = z.infer<typeof signInFormSchema>

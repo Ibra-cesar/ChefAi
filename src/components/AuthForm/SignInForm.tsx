@@ -1,7 +1,7 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { Button } from "../ui/Button";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { signInForm, type SignInForm } from "../../utils/schema";
+import { signInFormSchema, type signInFormSchemaTypes } from "../../utils/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "../../utils/contexts/hooks/useAuth";
 import LoadingContainer from "../ui/LoadingContainer";
@@ -13,14 +13,14 @@ const SignInForm = () => {
     formState: { errors },
     handleSubmit,
     setError,
-  } = useForm<SignInForm>({
-    resolver: zodResolver(signInForm),
+  } = useForm<signInFormSchemaTypes>({
+    resolver: zodResolver(signInFormSchema),
   });
   const navigate = useNavigate();
 
   if (isAthenticated) return <Navigate to="/dashboard" replace />;
 
-  const handleSignIn: SubmitHandler<SignInForm> = async (data) => {
+  const handleSignIn: SubmitHandler<signInFormSchemaTypes> = async (data) => {
     try {
       await signIn(data)
       if (user) {
